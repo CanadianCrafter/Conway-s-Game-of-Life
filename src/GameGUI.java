@@ -12,25 +12,30 @@ import javax.swing.*;
  * Reference:https://math.hws.edu/eck/cs124/s14/lab7/lab7-files/Grid.java
  *
  */
-public class GameGUI extends JPanel implements ActionListener, MouseMotionListener {
-	private final static int BOARD_WIDTH = 40;
-	private final static int BOARD_HEIGHT = 40;
+public class GameGUI extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
+	private final static int BOARD_WIDTH = 80;
+	private final static int BOARD_HEIGHT = 80;
 	private final static int MARGIN = 4;
-	private final static int BOX_SIZE = 20;
+	private final static int BOX_SIZE = 10;
 	
 	private static JFrame window; 
 	
 	private Color[][] gridColour; //the colour of grid[row][column]; if null, it it is transparent
 	private Color lineColour; // Colour of grid lines; if null, no lines are drawn.
 	
+	private Timer animationTimer = new Timer(100, this); // the stop motion animation runs at 10 fps or every 0.1 seconds
+	private int animationIndex = 0; //timing for the animations
+	private final int NUM_ITERATIONS = 10000;
+	
 	//menubar
 	private static JMenuBar mb = new JMenuBar();
 	private static JMenu menu = new JMenu();
 	private static JMenuItem reset;
 	private static JMenuItem next;
+	private static JMenuItem play;
 	private static JMenuItem exit;
 	
-	private final int brushRadius = 11; //in pixels
+//	private final int brushRadius = 11; //in pixels
 	
 	public static Grid grid;
 
@@ -49,6 +54,7 @@ public class GameGUI extends JPanel implements ActionListener, MouseMotionListen
 		setPreferredSize(new Dimension(BOX_SIZE*BOARD_WIDTH, BOX_SIZE*BOARD_HEIGHT));
 		setBackground(Color.GRAY); // Set the background color for this panel.
 		addMouseMotionListener(this);     // Mouse actions will call methods in this object.
+		addMouseListener(this);     // Mouse actions will call methods in this object.
 	}
 	
 	/**
@@ -84,17 +90,20 @@ public class GameGUI extends JPanel implements ActionListener, MouseMotionListen
 		// menu items
 		reset = new JMenuItem("Reset Canvas");
 		next = new JMenuItem("Next Step");
+		play = new JMenuItem("Play");
 		exit = new JMenuItem("Exit");
 
 		// add to action listener for the menu items
 		reset.addActionListener(this);
 		next.addActionListener(this);
+		play.addActionListener(this);
 		exit.addActionListener(this);
 
 		window.setJMenuBar(mb); // add menu bar
 		mb.add(menu); // add menu to menubar
 		menu.add(reset); // add items
 		menu.add(next);
+		menu.add(play);
 		menu.add(exit);
 
 	}
@@ -106,8 +115,8 @@ public class GameGUI extends JPanel implements ActionListener, MouseMotionListen
 	 */
 	private ArrayList<Integer> findRows(int pixelY) {
 		ArrayList<Integer> rows = new ArrayList<Integer>();
-		for(int i = (int) Math.round(((double)pixelY-brushRadius)/getHeight()*BOARD_HEIGHT); 
-				i<= Math.round(((double)pixelY+brushRadius)/getHeight()*BOARD_HEIGHT);i++) {
+		for(int i = (int) Math.round(((double)pixelY)/getHeight()*BOARD_HEIGHT); 
+				i<= Math.round(((double)pixelY)/getHeight()*BOARD_HEIGHT);i++) {
 			rows.add(i);
 		}
 		return rows;
@@ -120,8 +129,8 @@ public class GameGUI extends JPanel implements ActionListener, MouseMotionListen
 	 */
 	private ArrayList<Integer> findColumns(int pixelX) {
 		ArrayList<Integer> cols = new ArrayList<Integer>();
-		for(int i = (int) Math.round(((double)pixelX-brushRadius)/getHeight()*BOARD_WIDTH); 
-				i<= Math.round(((double)pixelX+brushRadius)/getHeight()*BOARD_WIDTH);i++) {
+		for(int i = (int) Math.round(((double)pixelX)/getHeight()*BOARD_WIDTH); 
+				i<= Math.round(((double)pixelX)/getHeight()*BOARD_WIDTH);i++) {
 			cols.add(i);
 		}
 		return cols;
@@ -205,6 +214,51 @@ public class GameGUI extends JPanel implements ActionListener, MouseMotionListen
 	}
 
 	@Override
+	public void mouseClicked(MouseEvent evt) {
+		// the rows and columns in the grid of squares where the user clicked.
+		ArrayList<Integer> rows = findRows(evt.getY() );
+		ArrayList<Integer> cols = findColumns(evt.getX());
+		for(int row = 0; row <rows.size();row++) {
+			for(int col = 0; col < cols.size();col++) {
+				if(gridColour[rows.get(row)][cols.get(col)]==null) {
+					gridColour[rows.get(row)][cols.get(col)] = Color.BLACK;
+				}
+				else {
+					gridColour[rows.get(row)][cols.get(col)] = null;
+				}
+				
+				grid.gameBoard[MARGIN+rows.get(row)][MARGIN+cols.get(col)] = !grid.gameBoard[MARGIN+rows.get(row)][MARGIN+cols.get(col)];
+				System.out.println(rows.get(row) + " " + cols.get(col));
+			}
+		}
+		repaint(); // Causes the panel to be redrawn, by calling the paintComponent method.
+	}
+
+	@Override
+	public void mousePressed(MouseEvent evt) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
 	public void actionPerformed(ActionEvent event) {
 		// resets the canvas
 		if (event.getSource() == reset) {
@@ -223,9 +277,31 @@ public class GameGUI extends JPanel implements ActionListener, MouseMotionListen
 			updateGrid();
 			repaint();
 		}
+		//plays the animation 500 iterations
+		else if (event.getSource() == play) {
+			animationTimer.start(); // starts timer for the animation
+			animationIndex = 0;
+		}
 		// exits 
 		else if (event.getSource() == exit) {
 			System.exit(0);
+		}
+		
+		else if (event.getSource() == animationTimer) {
+			// each 1/10 second, update the board
+			if(animationIndex<NUM_ITERATIONS) {
+				grid.updateGrid();
+				updateGrid();
+				repaint();
+			}
+			
+			//stops animation
+			else {
+				animationTimer.stop();
+				animationIndex = 0;
+			}
+			animationIndex++;
+				
 		}
 		
 	}

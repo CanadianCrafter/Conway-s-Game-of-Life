@@ -1,7 +1,7 @@
 
 public class Grid {
-	private final static int BOARD_WIDTH = 40;
-	private final static int BOARD_HEIGHT = 40;
+	private final static int BOARD_WIDTH = 80;
+	private final static int BOARD_HEIGHT = 80;
 	private final static int MARGIN = 4;
 	public static boolean gameBoard[][];
 	private static boolean tempBoard[][];
