@@ -5,11 +5,12 @@ public class Grid {
 	private final static int MARGIN = 4;
 	public static boolean gameBoard[][];
 	private static boolean tempBoard[][];
-	
+	private static boolean originalBoard[][];
 	
 	public Grid() {
 		gameBoard = new boolean[BOARD_HEIGHT+2*MARGIN][BOARD_WIDTH+2*MARGIN];
 		tempBoard = new boolean[BOARD_HEIGHT+2*MARGIN][BOARD_WIDTH+2*MARGIN];
+		originalBoard = new boolean[BOARD_HEIGHT+2*MARGIN][BOARD_WIDTH+2*MARGIN];
 		
 	}
 	
@@ -63,6 +64,26 @@ public class Grid {
 		for(int row = 0; row < BOARD_HEIGHT+2*MARGIN; row++) {
 			for(int col = 0; col < BOARD_WIDTH+2*MARGIN; col++) {
 				gameBoard[row][col] = tempBoard[row][col] = false;
+
+			}
+		}
+		
+	}
+	
+	public static void saveGrid() {	
+		for(int row = 0; row < BOARD_HEIGHT+2*MARGIN; row++) {
+			for(int col = 0; col < BOARD_WIDTH+2*MARGIN; col++) {
+				originalBoard[row][col] = gameBoard[row][col];
+
+			}
+		}
+		
+	}
+	
+	public static void resetGrid() {	
+		for(int row = 0; row < BOARD_HEIGHT+2*MARGIN; row++) {
+			for(int col = 0; col < BOARD_WIDTH+2*MARGIN; col++) {
+				gameBoard[row][col] = originalBoard[row][col];
 
 			}
 		}

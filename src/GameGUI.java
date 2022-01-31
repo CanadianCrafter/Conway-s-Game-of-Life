@@ -21,18 +21,22 @@ public class GameGUI extends JPanel implements ActionListener, MouseListener, Mo
 	private static JFrame window; 
 	
 	private Color[][] gridColour; //the colour of grid[row][column]; if null, it it is transparent
-	private Color lineColour; // Colour of grid lines; if null, no lines are drawn.
+	private Color lineColour = Color.GRAY; // Colour of grid lines; if null, no lines are drawn.
+	private Color backgroundColour = Color.RED; // Colour of grid lines; if null, no lines are drawn.
+	private Color cellColour = Color.YELLOW; //Colour of an alive cell
 	
-	private Timer animationTimer = new Timer(100, this); // the stop motion animation runs at 10 fps or every 0.1 seconds
+	private Timer animationTimer = new Timer(150, this); // the stop motion animation runs at 10 fps or every 0.1 seconds
 	private int animationIndex = 0; //timing for the animations
 	private final int NUM_ITERATIONS = 10000;
 	
 	//menubar
 	private static JMenuBar mb = new JMenuBar();
 	private static JMenu menu = new JMenu();
-	private static JMenuItem reset;
+	private static JMenuItem wipe;
 	private static JMenuItem next;
 	private static JMenuItem play;
+	private static JMenuItem pause;
+	private static JMenuItem reset;
 	private static JMenuItem exit;
 	
 //	private final int brushRadius = 11; //in pixels
@@ -50,9 +54,8 @@ public class GameGUI extends JPanel implements ActionListener, MouseListener, Mo
 	public GameGUI() {
 		menuBar();
 		gridColour = new Color[BOARD_HEIGHT][BOARD_WIDTH]; // Create the array that stores square colors.
-		lineColour = Color.BLACK;
 		setPreferredSize(new Dimension(BOX_SIZE*BOARD_WIDTH, BOX_SIZE*BOARD_HEIGHT));
-		setBackground(Color.GRAY); // Set the background color for this panel.
+		setBackground(backgroundColour); // Set the background color for this panel.
 		addMouseMotionListener(this);     // Mouse actions will call methods in this object.
 		addMouseListener(this);     // Mouse actions will call methods in this object.
 	}
@@ -88,22 +91,28 @@ public class GameGUI extends JPanel implements ActionListener, MouseListener, Mo
 		menu = new JMenu("Menu");
 
 		// menu items
-		reset = new JMenuItem("Reset Canvas");
+		wipe = new JMenuItem("Reset Canvas");
 		next = new JMenuItem("Next Step");
 		play = new JMenuItem("Play");
+		pause = new JMenuItem("Pause");
+		reset = new JMenuItem("Reset to Original");
 		exit = new JMenuItem("Exit");
 
 		// add to action listener for the menu items
-		reset.addActionListener(this);
+		wipe.addActionListener(this);
 		next.addActionListener(this);
 		play.addActionListener(this);
+		pause.addActionListener(this);
+		reset.addActionListener(this);
 		exit.addActionListener(this);
 
 		window.setJMenuBar(mb); // add menu bar
 		mb.add(menu); // add menu to menubar
-		menu.add(reset); // add items
+		menu.add(wipe); // add items
 		menu.add(next);
 		menu.add(play);
+		menu.add(pause);
+		menu.add(reset);
 		menu.add(exit);
 
 	}
@@ -140,7 +149,7 @@ public class GameGUI extends JPanel implements ActionListener, MouseListener, Mo
 		for (int row = 0; row < BOARD_HEIGHT; row++) {
 			for (int col = 0; col < BOARD_WIDTH; col++) {
 				if(grid.gameBoard[MARGIN+row][MARGIN+col]) {
-					gridColour[row][col] = Color.BLACK;
+					gridColour[row][col] = cellColour;
 				}
 				else {
 					gridColour[row][col] = null;
@@ -193,7 +202,7 @@ public class GameGUI extends JPanel implements ActionListener, MouseListener, Mo
 		for(int row = 0; row <rows.size();row++) {
 			for(int col = 0; col < cols.size();col++) {
 				if(gridColour[rows.get(row)][cols.get(col)]==null) {
-					gridColour[rows.get(row)][cols.get(col)] = Color.BLACK;
+					gridColour[rows.get(row)][cols.get(col)] = cellColour;
 				}
 				else {
 					gridColour[rows.get(row)][cols.get(col)] = null;
@@ -221,7 +230,7 @@ public class GameGUI extends JPanel implements ActionListener, MouseListener, Mo
 		for(int row = 0; row <rows.size();row++) {
 			for(int col = 0; col < cols.size();col++) {
 				if(gridColour[rows.get(row)][cols.get(col)]==null) {
-					gridColour[rows.get(row)][cols.get(col)] = Color.BLACK;
+					gridColour[rows.get(row)][cols.get(col)] = cellColour;
 				}
 				else {
 					gridColour[rows.get(row)][cols.get(col)] = null;
@@ -261,13 +270,14 @@ public class GameGUI extends JPanel implements ActionListener, MouseListener, Mo
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		// resets the canvas
-		if (event.getSource() == reset) {
+		if (event.getSource() == wipe) {
 			grid.wipeGrid();
 			for(int row = 0; row < BOARD_HEIGHT; row++) {
 				for(int col = 0; col < BOARD_WIDTH; col++) {
 					gridColour[row][col] = null;
 				}
 			}
+			animationTimer.stop();
 			updateGrid();
 			repaint();
 		}
@@ -281,6 +291,18 @@ public class GameGUI extends JPanel implements ActionListener, MouseListener, Mo
 		else if (event.getSource() == play) {
 			animationTimer.start(); // starts timer for the animation
 			animationIndex = 0;
+			grid.saveGrid();
+		}
+		//stops the animation
+		else if (event.getSource() == pause) {
+			animationTimer.stop(); // stops timer for the animation
+		}
+		//stops the animation
+		else if (event.getSource() == reset) {
+			animationTimer.stop(); // stops timer for the animation
+			grid.resetGrid();
+			updateGrid();
+			repaint();
 		}
 		// exits 
 		else if (event.getSource() == exit) {
