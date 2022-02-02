@@ -21,8 +21,8 @@ public class GameGUI extends JPanel implements ActionListener, MouseListener, Mo
 	private static JFrame window; 
 	
 	private Color[][] gridColour; //the colour of grid[row][column]; if null, it it is transparent
-	private Color lineColour = Color.GRAY; // Colour of grid lines; if null, no lines are drawn.
-	private Color backgroundColour = Color.RED; // Colour of grid lines; if null, no lines are drawn.
+	private Color lineColour = Color.WHITE; // Colour of grid lines; if null, no lines are drawn.
+	private Color backgroundColour = Color.GRAY; // Colour of grid lines; if null, no lines are drawn.
 	private Color cellColour = Color.YELLOW; //Colour of an alive cell
 	
 	private Timer animationTimer = new Timer(150, this); // the stop motion animation runs at 10 fps or every 0.1 seconds
@@ -209,7 +209,6 @@ public class GameGUI extends JPanel implements ActionListener, MouseListener, Mo
 				}
 				
 				grid.gameBoard[MARGIN+rows.get(row)][MARGIN+cols.get(col)] = !grid.gameBoard[MARGIN+rows.get(row)][MARGIN+cols.get(col)];
-				System.out.println(rows.get(row) + " " + cols.get(col));
 			}
 		}
 		
