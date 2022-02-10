@@ -38,6 +38,9 @@ Heavy-Weight Spaceship (HWSS)
 Gosper Glider Gun (It indefinitely shoots out gliders)  
 ![610px-Game_of_life_glider_gun svg](https://user-images.githubusercontent.com/62266519/152253113-7c40b5af-8100-4d23-8382-d03fb2fb550f.png)
 
+### RIP John Conway (1937 - 2020):
+![conwaysGameOfLife](https://user-images.githubusercontent.com/62266519/152917531-03967970-9e97-4ffe-8ceb-1328b732e03c.gif)
+
 
 ## Links
 Here are some interesting videos or links made by other people on the subject:
