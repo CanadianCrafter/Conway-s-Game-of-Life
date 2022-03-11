@@ -25,7 +25,10 @@ public class GameGUI extends JPanel implements ActionListener, MouseListener, Mo
 	private Color backgroundColour = Color.GRAY; // Colour of grid lines; if null, no lines are drawn.
 	private Color cellColour = Color.YELLOW; //Colour of an alive cell
 	
-	private Timer animationTimer = new Timer(150, this); // the stop motion animation runs at 10 fps or every 0.1 seconds
+	private final static int fastSpeed = 50;
+	private final static int normalSpeed = 100;
+	private final static int slowSpeed = 150;
+	private Timer animationTimer = new Timer(normalSpeed, this); // the stop motion animation runs at 10 fps or every 0.1 seconds
 	private int animationIndex = 0; //timing for the animations
 	private final int NUM_ITERATIONS = 10000;
 	
@@ -38,6 +41,10 @@ public class GameGUI extends JPanel implements ActionListener, MouseListener, Mo
 	private static JMenuItem pause;
 	private static JMenuItem reset;
 	private static JMenuItem exit;
+	private static JMenu speed = new JMenu();
+	private static JMenuItem fast;
+	private static JMenuItem normal;
+	private static JMenuItem slow;
 	
 //	private final int brushRadius = 11; //in pixels
 	
@@ -89,6 +96,8 @@ public class GameGUI extends JPanel implements ActionListener, MouseListener, Mo
 	private void menuBar() {
 		mb = new JMenuBar();
 		menu = new JMenu("Menu");
+		
+		speed = new JMenu("Speed");
 
 		// menu items
 		wipe = new JMenuItem("Reset Canvas");
@@ -97,6 +106,10 @@ public class GameGUI extends JPanel implements ActionListener, MouseListener, Mo
 		pause = new JMenuItem("Pause");
 		reset = new JMenuItem("Reset to Original");
 		exit = new JMenuItem("Exit");
+		
+		fast = new JMenuItem("Fast");
+		normal = new JMenuItem("Normal");
+		slow = new JMenuItem("Slow");
 
 		// add to action listener for the menu items
 		wipe.addActionListener(this);
@@ -105,15 +118,24 @@ public class GameGUI extends JPanel implements ActionListener, MouseListener, Mo
 		pause.addActionListener(this);
 		reset.addActionListener(this);
 		exit.addActionListener(this);
+		
+		fast.addActionListener(this);
+		normal.addActionListener(this);
+		slow.addActionListener(this);
 
 		window.setJMenuBar(mb); // add menu bar
 		mb.add(menu); // add menu to menubar
+		mb.add(speed);
 		menu.add(wipe); // add items
 		menu.add(next);
 		menu.add(play);
 		menu.add(pause);
 		menu.add(reset);
 		menu.add(exit);
+		
+		speed.add(fast);
+		speed.add(normal);
+		speed.add(slow);
 
 	}
 	
@@ -306,6 +328,16 @@ public class GameGUI extends JPanel implements ActionListener, MouseListener, Mo
 		// exits 
 		else if (event.getSource() == exit) {
 			System.exit(0);
+		}
+		//fast speed
+		else if (event.getSource() == fast) {
+			animationTimer.setDelay(fastSpeed);
+		}
+		else if (event.getSource() == normal) {
+			animationTimer.setDelay(normalSpeed);
+		}
+		else if (event.getSource() == slow) {
+			animationTimer.setDelay(slowSpeed);
 		}
 		
 		else if (event.getSource() == animationTimer) {
